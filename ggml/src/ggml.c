@@ -266,7 +266,10 @@ inline static void * ggml_aligned_malloc(size_t size) {
 #include "ggml-cuda.h"
 #elif defined(GGML_USE_CLBLAST)
 #include "ggml-opencl.h"
+#elif defined(GGML_USE_XRT)
+#include "ggml-xrt.h"
 #endif
+
 
 // floating point type used to accumulate sums
 typedef double ggml_float;
@@ -2230,6 +2233,8 @@ struct ggml_context * ggml_init(struct ggml_init_params params) {
         ggml_init_cublas();
 #elif defined(GGML_USE_CLBLAST)
         ggml_cl_init();
+#elif defined(GGML_USE_XRT)
+        ggml_init_xrt();
 #endif
 
         ggml_setup_op_has_task_pass();
@@ -6814,6 +6819,13 @@ static void ggml_compute_forward_add_f32(
     const int ith = params->ith;
     const int nth = params->nth;
 
+#ifdef GGML_USE_XRT
+    if (ith == 0) {
+        ggml_xrt_add_f32(params, dst);
+    }
+    return;
+#endif
+
     const int nr  = ggml_nrows(src0);
 
     GGML_TENSOR_BINARY_OP_LOCALS
@@ -7600,6 +7612,13 @@ static void ggml_compute_forward_mul_f32(
         }
         return;
     }
+#endif
+
+#ifdef GGML_USE_XRT
+    if (ith == 0) {
+        ggml_xrt_mul_f32(params, dst);
+    }
+    return;
 #endif
 
     const int64_t nr = ggml_nrows(src0);
