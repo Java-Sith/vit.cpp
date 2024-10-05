@@ -39,7 +39,6 @@
 #include "xrt/xrt_bo.h"
 #include "xrt/xrt_device.h"
 #include "xrt/xrt_kernel.h"
-#include "ecas-scripts/SW/timer.hpp"
 
 #define MATRIX_ROW_PADDING 512
 #define UNUSED GGML_UNUSED
