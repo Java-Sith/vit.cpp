@@ -202,6 +202,10 @@ if (GGML_CLBLAST)
     endif()
 endif()
 
+if (GGML_USE_XRT)
+    set(GGML_XRT_SOURCES ggml-xrt.cpp ggml-xrt.h)
+endif()
+
 if (GGML_CUBLAS)
     cmake_minimum_required(VERSION 3.17)
 
@@ -271,6 +275,7 @@ add_library(${TARGET}
     ${GGML_CUDA_SOURCES}
     ${GGML_OPENCL_SOURCES}
     ${GGML_METAL_SOURCES}
+    ${GGML_XRT_SOURCES}
     )
 
 target_include_directories(${TARGET} PUBLIC
