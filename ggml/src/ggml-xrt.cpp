@@ -33,7 +33,6 @@
 
 #include "ggml-xrt.h"
 #include "ggml-backend-impl.h"
-#include "ggml-quants.h"
 #include "ap_fixed.h"
 
 // XRT includes
@@ -67,13 +66,7 @@ inline static void ggml_vec_cpy_f32 (const int n, float * y, const float * x) { 
 inline static void ggml_vec_scale_f32(const int n, float * y, const float   v) { for (int i = 0; i < n; ++i) y[i] *= v; }
 inline static void ggml_vec_acc_f32 (const int n, float * y, const float * x) { for (int i = 0; i < n; ++i) y[i] += x[i]; }
 
-static size_t ggml_nbytes_split(const struct ggml_tensor * tensor, int nrows_split) {
-    static_assert(GGML_MAX_DIMS == 4, "GGML_MAX_DIMS is not 4 - update this function");
-
-    return nrows_split*ggml_row_size(tensor->type, tensor->ne[0]);
-}
-
-GGML_CALL static void ggml_xrt_set_device(const int main_device) {
+static void ggml_xrt_set_device(const int main_device) {
     if (main_device >= g_device_count) {
         fprintf(stderr, "warning: cannot set main_device=%d because there are only %d devices. Using device %d instead.\n",
                 main_device, g_device_count, g_main_device);
