@@ -23,7 +23,6 @@ if(DEFINED ENV{VIT_XRT})
     message(STATUS "Using XRT")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c17 -fPIC")          #MK_CFLAGS    = -std=c17   -fPIC
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -fPIC")    #MK_CXXFLAGS  = -std=c++17 -fPIC
-    add_definitions(-DGGML_USE_XRT)                               #MK_CPPFLAGS += -DGGML_USE_XRT -I${XILINX_XRT}/include -I./ecas-scripts/SW/hls-type
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
