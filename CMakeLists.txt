@@ -27,7 +27,7 @@ if(DEFINED ENV{VIT_XRT})
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -fPIC")    #MK_CXXFLAGS  = -std=c++17 -fPIC
     set(CMAKE_NVCC_FLAGS "${CMAKE_NVCC_FLAGS} -std=c++17")        #MK_NVCCFLAGS = -std=c++17
     add_definitions(-DGGML_USE_XRT)                               #MK_CPPFLAGS += -DGGML_USE_XRT -I${XILINX_XRT}/include -I./ecas-scripts/SW/hls-typ
-    include_directories($ENV{XILINX_XRT}/include/xrt) #Comentario anterior
+    include_directories($ENV{XILINX_XRT}/include ../ecas-scripts/SW/hls-types/include) #Comentario anterior
     link_directories($ENV{XILINX_XRT}/lib)                        #MK_LDFLAGS  += -L${XILINX_XRT}/lib -lxrt_core -lxrt_coreutil
     #target_link_libraries(${PROJECT_NAME} PUBLIC xrt_core xrt_coreutil)               #Comentario Anterior
     list(APPEND SOURCES ggml/src/ggml-xrt.cpp)  # Agrega ggml-xrt.cpp a la lista de fuentes

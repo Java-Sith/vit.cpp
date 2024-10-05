@@ -34,6 +34,7 @@
 #include "ggml-xrt.h"
 #include "ggml-backend-impl.h"
 #include "ggml-quants.h"
+#include "ap_fixed.h"
 
 // XRT includes
 #include "xrt/xrt_bo.h"
