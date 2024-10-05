@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(vit
         DESCRIPTION "Inference Vision Transformer (ViT) in plain C/C++ with ggml"
-        HOMEPAGE_URL "https://github.com/staghado/vit.cpp")
+        HOMEPAGE_URL "https://github.com/Java-Sith/vit.cpp")
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -21,28 +21,12 @@ set(SOURCES main.cpp vit.cpp)  # Define los archivos fuente predeterminados
 
 if(DEFINED ENV{VIT_XRT})
     message(STATUS "Using XRT")
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR} common)       #MK_CPPFLAGS  = -I. -Icommon
-    include_directories(ggml/src)                                 #Para anadir el directorio de ggml-xrt.h y ggml-xrt.cpp
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c17 -fPIC")          #MK_CFLAGS    = -std=c17   -fPIC
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -fPIC")    #MK_CXXFLAGS  = -std=c++17 -fPIC
-    set(CMAKE_NVCC_FLAGS "${CMAKE_NVCC_FLAGS} -std=c++17")        #MK_NVCCFLAGS = -std=c++17
-    add_definitions(-DGGML_USE_XRT)                               #MK_CPPFLAGS += -DGGML_USE_XRT -I${XILINX_XRT}/include -I./ecas-scripts/SW/hls-typ
-    include_directories($ENV{XILINX_XRT}/include/xrt ecas-scripts/SW/hls-types/include) #Comentario anterior
-    link_directories($ENV{XILINX_XRT}/lib)                        #MK_LDFLAGS  += -L${XILINX_XRT}/lib -lxrt_core -lxrt_coreutil
-    #target_link_libraries(${PROJECT_NAME} PUBLIC xrt_core xrt_coreutil)               #Comentario Anterior
-    list(APPEND SOURCES ggml/src/ggml-xrt.cpp)  # Agrega ggml-xrt.cpp a la lista de fuentes
-    #add_executable(${PROJECT_NAME} ggml-xrt.cpp) #OBJS        += ggml-xrt.o
-#La ultima linea al parecer tambien ejecuta: #ifdef LLAMA_XRT
-#ggml-xrt.o: ggml-xrt.cpp ggml-xrt.h ggml.h
-#	$(CXX) $(CXXFLAGS) -c $< -o $@
+    add_definitions(-DGGML_USE_XRT)                               #MK_CPPFLAGS += -DGGML_USE_XRT -I${XILINX_XRT}/include -I./ecas-scripts/SW/hls-type
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
-
-if(DEFINED ENV{VIT_XRT_CLOCK})  #ifdef LLAMA_XRT_CLOCK
-    add_definitions(-DXRT_CLOCK)  #MK_CPPFLAGS  += -DXRT_CLOCK
-endif()                           #endif
-
 
 # Vincular las bibliotecas XRT si están definidas
 if(DEFINED ENV{VIT_XRT})
@@ -60,12 +44,15 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -march=native")
 # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffast-math")
 
 # deps
+# Add an option for XRT support
+option(GGML_XRT "Enable XRT support in the project" TRUE)
+
 add_subdirectory(ggml)
 
 # vit executable
 target_link_libraries(${PROJECT_NAME} PUBLIC ggml)
 target_include_directories(${PROJECT_NAME} PUBLIC .)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 # quantize executable
 option(BUILD_QUANTIZE "Build the quantization executable" ON)
@@ -74,7 +61,7 @@ if (BUILD_QUANTIZE)
     add_executable(quantize quantize.cpp)
     target_link_libraries(quantize PUBLIC ggml)
     target_include_directories(quantize PUBLIC .)
-    target_compile_features(quantize PUBLIC cxx_std_11)
+    target_compile_features(quantize PUBLIC cxx_std_17)
 endif()
 
 # benchmark executable (optional)
