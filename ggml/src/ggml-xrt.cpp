@@ -34,7 +34,6 @@
 #include "ggml-xrt.h"
 #include "ggml-backend-impl.h"
 #include "ggml-quants.h"
-#include "ap_fixed.h"
 
 // XRT includes
 #include "xrt/xrt_bo.h"
@@ -194,7 +193,7 @@ void ggml_xrt_add_f32(const struct ggml_compute_params * params,
     }
 }
 
-static void ggml_xrt_add(
+/*static void ggml_xrt_add(
     const struct ggml_compute_params *params,
     struct ggml_tensor *dst)
 {
@@ -214,7 +213,7 @@ static void ggml_xrt_add(
                 ggml_compute_forward_add(params, dst);
             } break;
     }
-}
+}*/
 
 // ggml_compute_forward_mul
 
@@ -305,7 +304,7 @@ void ggml_xrt_mul_f32(const struct ggml_compute_params * params,
     }
 }
 
-static void ggml_xrt_mul(
+/*static void ggml_xrt_mul(
         const struct ggml_compute_params * params,
         struct ggml_tensor * dst) {
 
@@ -324,7 +323,7 @@ static void ggml_xrt_mul(
                 ggml_compute_forward_mul(params, dst);
             } break;
     }
-}
+}*/
 
 // ggml_compute_forward_transpose
 
