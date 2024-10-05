@@ -203,7 +203,18 @@ if (GGML_CLBLAST)
 endif()
 
 if (GGML_USE_XRT)
-    set(GGML_XRT_SOURCES ggml-xrt.cpp ggml-xrt.h)
+    set(XRT_INCLUDE_SEARCH_PATHS
+        $ENV{XILINX_XRT}/include/xrt 
+        ../ecas-scripts/SW/hls-types/include
+        )
+    find_path(XRT_INC NAMES xrt/xrt_bo.h PATHS ${XRT_INCLUDE_SEARCH_PATHS})
+    if (XRT_INC)
+        message(STATUS "XRT found")
+        set(GGML_EXTRA_INCS  ${GGML_EXTRA_INCS}  ${XRT_INC})
+        set(GGML_XRT_SOURCES ggml-xrt.cpp ggml-xrt.h)
+    else()
+        message(WARNING "XRT not found")
+    endif()
 endif()
 
 if (GGML_CUBLAS)
