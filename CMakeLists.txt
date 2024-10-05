@@ -21,8 +21,8 @@ set(SOURCES main.cpp vit.cpp)  # Define los archivos fuente predeterminados
 
 if(DEFINED ENV{VIT_XRT})
     message(STATUS "Using XRT")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c14 -fPIC")          #MK_CFLAGS    = -std=c17   -fPIC
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -fPIC")    #MK_CXXFLAGS  = -std=c++17 -fPIC
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c17 -fPIC")          #MK_CFLAGS    = -std=c17   -fPIC
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -fPIC")    #MK_CXXFLAGS  = -std=c++17 -fPIC
 endif()
 
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -51,7 +51,7 @@ add_subdirectory(ggml)
 # vit executable
 target_link_libraries(${PROJECT_NAME} PUBLIC ggml)
 target_include_directories(${PROJECT_NAME} PUBLIC .)
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 
 # quantize executable
 option(BUILD_QUANTIZE "Build the quantization executable" ON)
@@ -60,7 +60,7 @@ if (BUILD_QUANTIZE)
     add_executable(quantize quantize.cpp)
     target_link_libraries(quantize PUBLIC ggml)
     target_include_directories(quantize PUBLIC .)
-    target_compile_features(quantize PUBLIC cxx_std_14)
+    target_compile_features(quantize PUBLIC cxx_std_17)
 endif()
 
 # benchmark executable (optional)
@@ -74,5 +74,5 @@ if(BUILD_BENCHMARK)
     target_link_libraries(benchmark PRIVATE nlohmann_json::nlohmann_json)
     target_link_libraries(benchmark PUBLIC ggml)
     target_include_directories(benchmark PUBLIC .)
-    target_compile_features(benchmark PUBLIC cxx_std_14)
+    target_compile_features(benchmark PUBLIC cxx_std_17)
 endif()
