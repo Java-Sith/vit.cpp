@@ -25,9 +25,9 @@ extern "C" {
 
 void ggml_xrt_add_f32(const struct ggml_compute_params * params, struct ggml_tensor * dst);
 void ggml_xrt_mul_f32(const struct ggml_compute_params * params, struct ggml_tensor * dst);
-GGML_API void ggml_init_xrt(void);
-GGML_API void ggml_end_xrt(void);
-GGML_API bool   ggml_xrt_compute_forward(struct ggml_compute_params * params, struct ggml_tensor * tensor);
+void ggml_init_xrt(void);
+void ggml_end_xrt(void);
+//bool   ggml_xrt_compute_forward(struct ggml_compute_params * params, struct ggml_tensor * tensor);
 
 #ifdef  __cplusplus
 }
