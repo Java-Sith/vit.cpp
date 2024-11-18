@@ -48,7 +48,7 @@ static int g_main_device = 0;
 static const size_t CACHE_LINE_SIZE_F32 = 64/sizeof(float);
 
 static xrt::device myDevice;
-static std::string binaryFile = "./ecas-scripts/HW/package.hw/kernels.xclbin";
+static std::string binaryFile = "/home/gblanco/ViTXRT/vit.cpp/ggml/ecas-scripts/HW/package.hw/kernels.xclbin";
 //static xrt::kernel matvecmul;
 static xrt::kernel elementwise;
 //static xrt::kernel softmax;

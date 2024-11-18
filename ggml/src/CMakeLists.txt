@@ -204,9 +204,12 @@ endif()
 if (GGML_XRT)
     set(XRT_INCLUDE_SEARCH_PATHS
         $ENV{XILINX_XRT}/include/xrt
-        $ENV{XILINX_XRT}/lib 
+        $ENV{XILINX_XRT}/lib
+#------------------------GBLANCO---------------------------------------- 
         ../ecas-scripts/SW/hls-types/include
+$ENV{XILINX_XRT}/include/experimental
         )
+#FIN----------------------------------------------------------
     find_path(XRT_INC NAMES xrt/xrt_bo.h PATHS ${XRT_INCLUDE_SEARCH_PATHS})
     find_library(XRT_CORE NAMES xrt_core)
 	find_library(XRT_CORE_UTIL NAMES xrt_coreutil)
