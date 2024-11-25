@@ -154,13 +154,13 @@ void ggml_xrt_add_f32(const struct ggml_compute_params * params,
     int64_t src1_size = ne10 * ne11;
     int64_t dst_size = ne0 * ne1;
 
-    int64_t padded_ne00 = next_multiple_of_eight(ne00);
-    int64_t padded_ne10 = next_multiple_of_eight(ne10);
-    int64_t padded_ne0 = next_multiple_of_eight(ne0);
+    int64_t padded_ne01 = next_multiple_of_eight(ne00);
+    int64_t padded_ne11 = next_multiple_of_eight(ne10);
+    int64_t padded_ne1 = next_multiple_of_eight(ne0);
 
-    int64_t padded_src0_size = padded_ne00 * ne01;
-    int64_t padded_src1_size = padded_ne10 * ne11;
-    int64_t padded_dst_size = padded_ne0 * ne1;
+    int64_t padded_src0_size = padded_ne01 * ne00;
+    int64_t padded_src1_size = padded_ne11 * ne10;
+    int64_t padded_dst_size = padded_ne1 * ne0;
 
     // Allocate XRT buffers
     auto bo_a = xrt::bo(myDevice, padded_src0_size * sizeof(float), elementwise.group_id(0));
@@ -284,13 +284,13 @@ void ggml_xrt_mul_f32(const struct ggml_compute_params * params,
     int64_t src1_size = ne10 * ne11;
     int64_t dst_size = ne0 * ne1;
 
-    int64_t padded_ne00 = next_multiple_of_eight(ne00);
-    int64_t padded_ne10 = next_multiple_of_eight(ne10);
-    int64_t padded_ne0 = next_multiple_of_eight(ne0);
+    int64_t padded_ne01 = next_multiple_of_eight(ne00);
+    int64_t padded_ne11 = next_multiple_of_eight(ne10);
+    int64_t padded_ne1 = next_multiple_of_eight(ne0);
 
-    int64_t padded_src0_size = padded_ne00 * ne01;
-    int64_t padded_src1_size = padded_ne10 * ne11;
-    int64_t padded_dst_size = padded_ne0 * ne1;
+    int64_t padded_src0_size = padded_ne01 * ne00;
+    int64_t padded_src1_size = padded_ne11 * ne10;
+    int64_t padded_dst_size = padded_ne1 * ne0;
 
     // Allocate XRT buffers
     auto bo_a = xrt::bo(myDevice, padded_src0_size * sizeof(float), elementwise.group_id(0));
