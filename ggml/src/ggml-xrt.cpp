@@ -90,6 +90,15 @@ static void ggml_xrt_set_device(const int main_device) {
     fprintf(stderr, "Using device %d as main device\n", g_main_device);
 }
 
+// Function to find the next power of two greater than or equal to n
+int next_multiple_of_eight(int num) {
+    int remainder = num % 8;
+    if (remainder == 0) {
+        return num; // If already a multiple of 8
+    }
+    return num + (8 - remainder); // Add the difference to reach the next multiple
+}
+
 // void ggml_xrt_dup(
 //         const struct ggml_compute_params * params,
 //         struct ggml_tensor * dst) {
@@ -145,14 +154,18 @@ void ggml_xrt_add_f32(const struct ggml_compute_params * params,
     int64_t src1_size = ne10 * ne11;
     int64_t dst_size = ne0 * ne1;
 
-    // int padded_size0 = padded_ne00 * padded_ne01;
-    // int padded_size1 = padded_ne10 * padded_ne11;
-    // int padded_dst_size = padded_ne00 * padded_ne01;
+    ne00 = next_multiple_of_eight(ne00);
+    ne10 = next_multiple_of_eight(ne10);
+    ne0 = next_multiple_of_eight(ne0);
+
+    int64_t padded_src0_size = ne00 * ne01;
+    int64_t padded_src1_size = ne10 * ne11;
+    int64_t padded_dst_size = ne0 * ne1;
 
     // Allocate XRT buffers
-    auto bo_a = xrt::bo(myDevice, src0_size * sizeof(float), elementwise.group_id(0));
-    auto bo_b = xrt::bo(myDevice, src1_size * sizeof(float), elementwise.group_id(1));
-    auto bo_c = xrt::bo(myDevice, dst_size * sizeof(float), elementwise.group_id(2));
+    auto bo_a = xrt::bo(myDevice, padded_src0_size * sizeof(float), elementwise.group_id(0));
+    auto bo_b = xrt::bo(myDevice, padded_src1_size * sizeof(float), elementwise.group_id(1));
+    auto bo_c = xrt::bo(myDevice, padded_dst_size * sizeof(float), elementwise.group_id(2));
 
     // Map buffers to host memory
     auto bo_a_map = bo_a.map<float*>();
@@ -160,9 +173,9 @@ void ggml_xrt_add_f32(const struct ggml_compute_params * params,
     auto bo_c_map = bo_c.map<float*>();
 
     // Fill the buffers with zeroes
-    std::fill(bo_a_map, bo_a_map + src0_size, 0.0f);
-    std::fill(bo_b_map, bo_b_map + src1_size, 0.0f);
-    std::fill(bo_c_map, bo_c_map + dst_size, 0.0f);
+    std::fill(bo_a_map, bo_a_map + padded_src0_size, 0.0f);
+    std::fill(bo_b_map, bo_b_map + padded_src1_size, 0.0f);
+    std::fill(bo_c_map, bo_c_map + padded_dst_size, 0.0f);
 
     for (int64_t i03 = 0; i03 < ne03; i03++)
     {
@@ -271,14 +284,18 @@ void ggml_xrt_mul_f32(const struct ggml_compute_params * params,
     int64_t src1_size = ne10 * ne11;
     int64_t dst_size = ne0 * ne1;
 
-    // int padded_size0 = padded_ne00 * padded_ne01;
-    // int padded_size1 = padded_ne10 * padded_ne11;
-    // int padded_dst_size = padded_ne00 * padded_ne01;
+    ne00 = next_multiple_of_eight(ne00);
+    ne10 = next_multiple_of_eight(ne10);
+    ne0 = next_multiple_of_eight(ne0);
+
+    int64_t padded_src0_size = ne00 * ne01;
+    int64_t padded_src1_size = ne10 * ne11;
+    int64_t padded_dst_size = ne0 * ne1;
 
     // Allocate XRT buffers
-    auto bo_a = xrt::bo(myDevice, src0_size * sizeof(float), elementwise.group_id(0));
-    auto bo_b = xrt::bo(myDevice, src1_size * sizeof(float), elementwise.group_id(1));
-    auto bo_c = xrt::bo(myDevice, dst_size * sizeof(float), elementwise.group_id(2));
+    auto bo_a = xrt::bo(myDevice, padded_src0_size * sizeof(float), elementwise.group_id(0));
+    auto bo_b = xrt::bo(myDevice, padded_src1_size * sizeof(float), elementwise.group_id(1));
+    auto bo_c = xrt::bo(myDevice, padded_dst_size * sizeof(float), elementwise.group_id(2));
 
     // Map buffers to host memory
     auto bo_a_map = bo_a.map<float*>();
@@ -286,9 +303,9 @@ void ggml_xrt_mul_f32(const struct ggml_compute_params * params,
     auto bo_c_map = bo_c.map<float*>();
 
     // Fill the buffers with zeroes
-    std::fill(bo_a_map, bo_a_map + src0_size, 0.0f);
-    std::fill(bo_b_map, bo_b_map + src1_size, 0.0f);
-    std::fill(bo_c_map, bo_c_map + dst_size, 0.0f);
+    std::fill(bo_a_map, bo_a_map + padded_src0_size, 0.0f);
+    std::fill(bo_b_map, bo_b_map + padded_src1_size, 0.0f);
+    std::fill(bo_c_map, bo_c_map + padded_dst_size, 0.0f);
 
     for (int64_t i03 = 0; i03 < ne03; i03++)
     {
