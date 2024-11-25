@@ -139,6 +139,10 @@ void ggml_xrt_add_f32(const struct ggml_compute_params * params,
     const int nb0  = dst->nb[0];
     const int nb2  = dst->nb[2];
     const int nb3  = dst->nb[3];
+    const int nb02 = src0->nb[2];
+    const int nb03 = src0->nb[3];
+    const int nb12 = src1->nb[2];
+    const int nb13 = src1->nb[3];
     const int nb00  = src0->nb[0];
 
     GGML_ASSERT(nb0 == sizeof(float));
@@ -179,8 +183,8 @@ void ggml_xrt_add_f32(const struct ggml_compute_params * params,
         {
             // Copy tensor data to buffers with broadcasting
 
-            float *x = (float *)src0->data + i02*nb2 + i03*nb3;
-            float *y = (float *)src1->data + i02*nb2 + i03*nb3;
+            float *x = (float *)src0->data + i02*nb02 + i03*nb03;
+            float *y = (float *)src1->data + i02*nb12 + i03*nb13;
             float *d  = (float *)dst->data + i02*nb2 + i03*nb3;
 
             ggml_vec_cpy_f32(src0_size, bo_a_map, x);
@@ -265,6 +269,10 @@ void ggml_xrt_mul_f32(const struct ggml_compute_params * params,
     const int nb0  = dst->nb[0];
     const int nb2  = dst->nb[2];
     const int nb3  = dst->nb[3];
+    const int nb02 = src0->nb[2];
+    const int nb03 = src0->nb[3];
+    const int nb12 = src1->nb[2];
+    const int nb13 = src1->nb[3];
     const int nb00  = src0->nb[0];
 
     GGML_ASSERT(nb0 == sizeof(float));
@@ -303,16 +311,17 @@ void ggml_xrt_mul_f32(const struct ggml_compute_params * params,
     {
         for (int64_t i02 = 0; i02 < ne02; i02++)
         {
+            // Copy tensor data to buffers with broadcasting
 
-            float *x = (float *)src0->data + i02*nb2 + i03*nb3;
-            float *y = (float *)src1->data + i02*nb2 + i03*nb3;
+            float *x = (float *)src0->data + i02*nb02 + i03*nb03;
+            float *y = (float *)src1->data + i02*nb12 + i03*nb13;
             float *d  = (float *)dst->data + i02*nb2 + i03*nb3;
 
             ggml_vec_cpy_f32(src0_size, bo_a_map, x);
             ggml_vec_cpy_f32(src1_size, bo_b_map, y);
 
 #ifndef NDEBUG
-            std::cout << "Execution of the kernel Elementwise Mul\n";
+            std::cout << "Execution of the kernel Elementwise Add\n";
 #endif
 
             // Synchronize buffers with device
@@ -330,7 +339,6 @@ void ggml_xrt_mul_f32(const struct ggml_compute_params * params,
             std::cout << "Get the output data from the device" << std::endl;
 #endif
 
-            // Copy results to dst
             ggml_vec_cpy_f32(dst_size, d, bo_c_map);
         }
     }
