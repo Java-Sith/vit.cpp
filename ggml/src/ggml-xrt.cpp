@@ -195,7 +195,7 @@ void ggml_xrt_add_f32(const struct ggml_compute_params * params,
             bo_b.sync(XCL_BO_SYNC_BO_TO_DEVICE);
 
             // Execute the elementwise kernel
-            auto run = elementwise(bo_a, bo_b, bo_c, padded_dst_size, 0);
+            auto run = elementwise(bo_a, bo_b, bo_c, dst_size, 0);
             run.wait();
 
             // Synchronize results back to host
@@ -320,7 +320,7 @@ void ggml_xrt_mul_f32(const struct ggml_compute_params * params,
             bo_b.sync(XCL_BO_SYNC_BO_TO_DEVICE);
 
             // Execute the elementwise kernel
-            auto run = elementwise(bo_a, bo_b, bo_c, padded_dst_size, 1);
+            auto run = elementwise(bo_a, bo_b, bo_c, dst_size, 1);
             run.wait();
 
             // Synchronize results back to host
