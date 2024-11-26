@@ -183,9 +183,9 @@ void ggml_xrt_add_f32(const struct ggml_compute_params * params,
         {
             // Copy tensor data to buffers with broadcasting
 
-            float *x = (float *)src0->data + i02*nb02 + i03*nb03;
-            float *y = (float *)src1->data + i02*nb12 + i03*nb13;
-            float *d  = (float *)dst->data + i02*nb2 + i03*nb3;
+            float *x = (float *)((char *)src0->data + i02*nb02 + i03*nb03);
+            float *y = (float *)((char *)src1->data + i02*nb12 + i03*nb13);
+            float *d  = (float *)((char *)dst->data + i02*nb2 + i03*nb3);
 
             ggml_vec_cpy_f32(src0_size, bo_a_map, x);
             ggml_vec_cpy_f32(src1_size, bo_b_map, y);
@@ -313,9 +313,9 @@ void ggml_xrt_mul_f32(const struct ggml_compute_params * params,
         {
             // Copy tensor data to buffers with broadcasting
 
-            float *x = (float *)src0->data + i02*nb02 + i03*nb03;
-            float *y = (float *)src1->data + i02*nb12 + i03*nb13;
-            float *d  = (float *)dst->data + i02*nb2 + i03*nb3;
+            float *x = (float *)((char *)src0->data + i02*nb02 + i03*nb03);
+            float *y = (float *)((char *)src1->data + i02*nb12 + i03*nb13);
+            float *d  = (float *)((char *)dst->data + i02*nb2 + i03*nb3);
 
             ggml_vec_cpy_f32(src0_size, bo_a_map, x);
             ggml_vec_cpy_f32(src1_size, bo_b_map, y);
