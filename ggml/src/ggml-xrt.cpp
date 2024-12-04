@@ -90,15 +90,6 @@ static void ggml_xrt_set_device(const int main_device) {
     fprintf(stderr, "Using device %d as main device\n", g_main_device);
 }
 
-// Function to find the next power of two greater than or equal to n
-int next_multiple_of_eight(int num) {
-    int remainder = num % 8;
-    if (remainder == 0) {
-        return num; // If already a multiple of 8
-    }
-    return num + (8 - remainder); // Add the difference to reach the next multiple
-}
-
 // void ggml_xrt_dup(
 //         const struct ggml_compute_params * params,
 //         struct ggml_tensor * dst) {
@@ -158,9 +149,9 @@ void ggml_xrt_add_f32(const struct ggml_compute_params * params,
     int64_t src1_size = ne10 * ne11;
     int64_t dst_size = ne0 * ne1;
 
-    int64_t padded_src0_size = next_multiple_of_eight(src0_size);
-    int64_t padded_src1_size = next_multiple_of_eight(src1_size);
-    int64_t padded_dst_size = next_multiple_of_eight(dst_size);
+    int64_t padded_src0_size = GGML_PAD(src0_size, 8);
+    int64_t padded_src1_size = GGML_PAD(src1_size, 8);
+    int64_t padded_dst_size = GGML_PAD(dst_size, 8);
 
     // Allocate XRT buffers
     auto bo_a = xrt::bo(myDevice, padded_src0_size * sizeof(float), elementwise.group_id(0));
@@ -172,19 +163,24 @@ void ggml_xrt_add_f32(const struct ggml_compute_params * params,
     auto bo_b_map = bo_b.map<float*>();
     auto bo_c_map = bo_c.map<float*>();
 
-    // Fill the buffers with zeroes
-    std::fill(bo_a_map, bo_a_map + padded_src0_size, 0.0f);
-    std::fill(bo_b_map, bo_b_map + padded_src1_size, 0.0f);
-    std::fill(bo_c_map, bo_c_map + padded_dst_size, 0.0f);
-
     for (int64_t i03 = 0; i03 < ne03; i03++)
     {
         for (int64_t i02 = 0; i02 < ne02; i02++)
         {
+
+            // Fill the buffers with zeroes
+            std::fill(bo_a_map, bo_a_map + padded_src0_size, 0.0f);
+            std::fill(bo_b_map, bo_b_map + padded_src1_size, 0.0f);
+            std::fill(bo_c_map, bo_c_map + padded_dst_size, 0.0f);
+
+            const int64_t i13 = i03%ne13;
+            const int64_t i12 = i02%ne12;
+            const int i1 = i13*ne12*ne11 + i12*ne11;
+
             // Copy tensor data to buffers with broadcasting
 
             float *x = (float *)((char *)src0->data + i02*nb02 + i03*nb03);
-            float *y = (float *)((char *)src1->data + i02*nb12 + i03*nb13);
+            float *y = (float *)((char *)src1->data + i1*ne10);
             float *d  = (float *)((char *)dst->data + i02*nb2 + i03*nb3);
 
             ggml_vec_cpy_f32(src0_size, bo_a_map, x);
@@ -288,9 +284,9 @@ void ggml_xrt_mul_f32(const struct ggml_compute_params * params,
     int64_t src1_size = ne10 * ne11;
     int64_t dst_size = ne0 * ne1;
 
-    int64_t padded_src0_size = next_multiple_of_eight(src0_size);
-    int64_t padded_src1_size = next_multiple_of_eight(src1_size);
-    int64_t padded_dst_size = next_multiple_of_eight(dst_size);
+    int64_t padded_src0_size = GGML_PAD(src0_size, 8);
+    int64_t padded_src1_size = GGML_PAD(src1_size, 8);
+    int64_t padded_dst_size = GGML_PAD(dst_size, 8);
 
     // Allocate XRT buffers
     auto bo_a = xrt::bo(myDevice, padded_src0_size * sizeof(float), elementwise.group_id(0));
@@ -302,26 +298,31 @@ void ggml_xrt_mul_f32(const struct ggml_compute_params * params,
     auto bo_b_map = bo_b.map<float*>();
     auto bo_c_map = bo_c.map<float*>();
 
-    // Fill the buffers with zeroes
-    std::fill(bo_a_map, bo_a_map + padded_src0_size, 0.0f);
-    std::fill(bo_b_map, bo_b_map + padded_src1_size, 0.0f);
-    std::fill(bo_c_map, bo_c_map + padded_dst_size, 0.0f);
-
     for (int64_t i03 = 0; i03 < ne03; i03++)
     {
         for (int64_t i02 = 0; i02 < ne02; i02++)
         {
+
+            // Fill the buffers with zeroes
+            std::fill(bo_a_map, bo_a_map + padded_src0_size, 0.0f);
+            std::fill(bo_b_map, bo_b_map + padded_src1_size, 0.0f);
+            std::fill(bo_c_map, bo_c_map + padded_dst_size, 0.0f);
+
+            const int64_t i13 = i03%ne13;
+            const int64_t i12 = i02%ne12;
+            const int i1 = i13*ne12*ne11 + i12*ne11;
+
             // Copy tensor data to buffers with broadcasting
 
             float *x = (float *)((char *)src0->data + i02*nb02 + i03*nb03);
-            float *y = (float *)((char *)src1->data + i02*nb12 + i03*nb13);
+            float *y = (float *)((char *)src1->data + i1*ne10);
             float *d  = (float *)((char *)dst->data + i02*nb2 + i03*nb3);
 
             ggml_vec_cpy_f32(src0_size, bo_a_map, x);
             ggml_vec_cpy_f32(src1_size, bo_b_map, y);
 
 #ifndef NDEBUG
-            std::cout << "Execution of the kernel Elementwise Add\n";
+            std::cout << "Execution of the kernel Elementwise Mul\n";
 #endif
 
             // Synchronize buffers with device
