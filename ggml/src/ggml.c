@@ -6822,8 +6822,8 @@ static void ggml_compute_forward_add_f32(
 #ifdef GGML_USE_XRT
     if (ith == 0) {
         ggml_xrt_add_f32(params, dst);
+        return;
     }
-    return;
 #endif
 
     const int nr  = ggml_nrows(src0);
@@ -7617,8 +7617,8 @@ static void ggml_compute_forward_mul_f32(
 #ifdef GGML_USE_XRT
     if (ith == 0) {
         ggml_xrt_mul_f32(params, dst);
+        return;
     }
-    return;
 #endif
 
     const int64_t nr = ggml_nrows(src0);
