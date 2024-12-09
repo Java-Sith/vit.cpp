@@ -6822,8 +6822,8 @@ static void ggml_compute_forward_add_f32(
 #ifdef GGML_USE_XRT
     if (ith == 0) {
         ggml_xrt_add_f32(params, dst);
-        return;
     }
+    return;
 #endif
 
     const int nr  = ggml_nrows(src0);
@@ -7617,8 +7617,8 @@ static void ggml_compute_forward_mul_f32(
 #ifdef GGML_USE_XRT
     if (ith == 0) {
         ggml_xrt_mul_f32(params, dst);
-        return;
     }
+    return;
 #endif
 
     const int64_t nr = ggml_nrows(src0);
@@ -8661,6 +8661,13 @@ static void ggml_compute_forward_relu_f32(
         return;
     }
 
+#ifdef GGML_USE_XRT
+    if (ith == 0) {
+        ggml_xrt_unary_f32(params, dst, 1);
+    }
+    return;
+#endif
+
     const int n  = ggml_nrows(src0);
     const int nc = src0->ne[0];
 
@@ -8824,6 +8831,13 @@ static void ggml_compute_forward_silu_f32(
 
     const int ith = params->ith;
     const int nth = params->nth;
+
+#ifdef GGML_USE_XRT
+    if (ith == 0) {
+        ggml_xrt_unary_f32(params, dst, 2);
+    }
+    return;
+#endif
 
     const int nc = src0->ne[0];
     const int nr = ggml_nrows(src0);
